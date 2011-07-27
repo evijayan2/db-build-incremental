@@ -10,12 +10,9 @@ import java.sql.CallableStatement;
 import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.NClob;
 import java.sql.PreparedStatement;
-import java.sql.SQLClientInfoException;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
-import java.sql.SQLXML;
 import java.sql.Savepoint;
 import java.sql.Statement;
 import java.sql.Struct;
@@ -26,7 +23,6 @@ import java.util.Properties;
  *
  * @author ElangovanV
  */
-
 public class JDCConnection implements Connection {
 
     private JDCConnectionPool pool;
@@ -34,30 +30,30 @@ public class JDCConnection implements Connection {
     private boolean inuse;
     private long timestamp;
 
-
     public JDCConnection(Connection conn, JDCConnectionPool pool) {
-        this.conn=conn;
-        this.pool=pool;
-        this.inuse=false;
-        this.timestamp=0;
+        this.conn = conn;
+        this.pool = pool;
+        this.inuse = false;
+        this.timestamp = 0;
     }
 
     public synchronized boolean lease() {
-       if(inuse)  {
-           return false;
-       } else {
-          inuse=true;
-          timestamp=System.currentTimeMillis();
-          return true;
-       }
+        if (inuse) {
+            return false;
+        } else {
+            inuse = true;
+            timestamp = System.currentTimeMillis();
+            return true;
+        }
     }
+
     public boolean validate() {
-	try {
+        try {
             conn.getMetaData();
-        }catch (Exception e) {
-	    return false;
-	}
-	return true;
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
     }
 
     public boolean inUse() {
@@ -68,12 +64,12 @@ public class JDCConnection implements Connection {
         return timestamp;
     }
 
-    public void close() throws SQLException {        
+    public void close() throws SQLException {
         pool.returnConnection(this);
     }
 
     protected void expireLease() {
-        inuse=false;
+        inuse = false;
     }
 
     protected Connection getConnection() {
@@ -123,7 +119,7 @@ public class JDCConnection implements Connection {
     public void setReadOnly(boolean readOnly) throws SQLException {
         conn.setReadOnly(readOnly);
     }
-  
+
     public boolean isReadOnly() throws SQLException {
         return conn.isReadOnly();
     }
@@ -228,23 +224,7 @@ public class JDCConnection implements Connection {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public NClob createNClob() throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public SQLXML createSQLXML() throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
     public boolean isValid(int timeout) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public void setClientInfo(String name, String value) throws SQLClientInfoException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public void setClientInfo(Properties properties) throws SQLClientInfoException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -261,14 +241,6 @@ public class JDCConnection implements Connection {
     }
 
     public Struct createStruct(String typeName, Object[] attributes) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public <T> T unwrap(Class<T> iface) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public boolean isWrapperFor(Class<?> iface) throws SQLException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 }

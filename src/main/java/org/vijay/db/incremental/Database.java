@@ -8,7 +8,7 @@ import org.vijay.db.incremental.pool.JDCConnectionDriver;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Properties;
+import java.util.Map;
 
 /**
  *
@@ -29,13 +29,13 @@ public class Database {
     protected Database() {        
     }
     
-    private void init(Properties prop) {
-        command = prop.getProperty("sysexeccommand");
-        sysuser = prop.getProperty("systemuser");
-        syspass = prop.getProperty("systempassword");
-        sysdb = prop.getProperty("sysdatabase");
-        sysdriver = prop.getProperty("sysdriver");
-        sysurl = prop.getProperty("url_path");
+    private void init(Map prop) {
+        command = prop.get("sysexeccommand").toString();
+        sysuser = prop.get("systemuser").toString();
+        syspass = prop.get("systempassword").toString();
+        sysdb = prop.get("sysdatabase").toString();
+        sysdriver = prop.get("sysdriver").toString();
+        sysurl = prop.get("url_path").toString();
 
         try {
              jDCConnectionDriver=new JDCConnectionDriver(sysdriver, sysurl, sysuser, syspass);             
@@ -48,7 +48,7 @@ public class Database {
         return DriverManager.getConnection("jdbc:jdc:jdcpool");
     }
 
-    public static Database getInstance(Properties prop) {
+    public static Database getInstance(Map prop) {
         
         if (instance == null) {
             instance = new Database();

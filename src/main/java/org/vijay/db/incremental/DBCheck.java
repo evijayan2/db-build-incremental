@@ -5,9 +5,13 @@
 package org.vijay.db.incremental;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Iterator;
+import java.util.Map;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -15,16 +19,20 @@ import java.sql.SQLException;
  */
 public class DBCheck {
 
+    private static Logger logger = Logger.getLogger(DBCheck.class);
     private SqlIncremental sqlIncremental;
     private Database database;
 
     public DBCheck(Database database, Incremental incremental) {
 
         this.database = database;
-        
+
         if (incremental instanceof SqlIncremental) {
             sqlIncremental = (SqlIncremental) incremental;
         }
+    }
+
+    public DBCheck() {
     }
 
     public void insertBuildMetaData(String status) {
@@ -40,15 +48,15 @@ public class DBCheck {
                 + "STATUS,SUBMITTER,TRANSACTION_PARAMS) VALUES(?,?,?,?,?,?,?)";
         PreparedStatement ps = null;
         ResultSet rs = null;
-        Connection conn=null;
+        Connection conn = null;
         try {
-            if (isIncrementalEntryPresent(buildNumber,transactionParams, patchLevel, name)) {
+            if (isIncrementalEntryPresent(buildNumber, transactionParams, patchLevel, name)) {
                 updateBuildMetaData(buildNumber, patchLevel,
                         type, name, status, submitter,
                         transactionParams);
                 return;
             }
-            conn=database.getConnection();
+            conn = database.getConnection();
             ps = conn.prepareStatement(insertStatement);
             ps.setString(1, buildNumber);
             if (patchLevel != null) {
@@ -84,9 +92,9 @@ public class DBCheck {
                 + "( TRANSACTION_PARAMS=? OR TRANSACTION_PARAMS IS NULL) and NAME=? and PATCH_LEVEL=?";
         PreparedStatement ps = null;
         ResultSet rs = null;
-        Connection conn=null;
+        Connection conn = null;
         try {
-            conn=database.getConnection();
+            conn = database.getConnection();
             ps = conn.prepareStatement(insertStatement);
             ps.setString(1, status);
             ps.setString(2, buildNumber);
@@ -114,15 +122,15 @@ public class DBCheck {
         }
     }
 
-    public boolean isIncrementalEntryPresent(String buildNumber,String transactionParams, String patchLevel, String name) {
+    public boolean isIncrementalEntryPresent(String buildNumber, String transactionParams, String patchLevel, String name) {
         boolean wasSuccess = false;
         String selectStatement = "SELECT COUNT(*) FROM BUILD_TRANSACTION_HISTORY WHERE BUILD_NUMBER=? and "
                 + "( TRANSACTION_PARAMS=? OR TRANSACTION_PARAMS IS NULL) and NAME=? and PATCH_LEVEL=?"; //
         PreparedStatement ps = null;
         ResultSet rs = null;
-        Connection conn=null;
+        Connection conn = null;
         try {
-            conn=database.getConnection();
+            conn = database.getConnection();
             ps = conn.prepareStatement(selectStatement);
             ps.setString(1, buildNumber);
             ps.setString(2, transactionParams);
@@ -220,5 +228,32 @@ public class DBCheck {
 
         System.out.println("The incremental " + name + " for build number " + buildNumber + " patch level " + patchLevel + " with params " + transactionParams + " has been sucessfully run " + wasSuccess);
         return wasSuccess;
+    }
+
+    public boolean validateUsers(Map dbMap, Map userMap) {
+        try {
+            String sysdriver = dbMap.get("sysdriver").toString();
+            String sysurl = dbMap.get("url_path").toString();
+
+            Class.forName(sysdriver);
+
+            Iterator iterator = userMap.keySet().iterator();
+            while (iterator.hasNext()) {
+                String key = (String) iterator.next();
+                logger.debug("Connecting user: " + key);
+                Connection con = DriverManager.getConnection(sysurl, key, userMap.get(key).toString());
+                logger.debug("Sucessfully connected to user: " + key);
+                if (con != null) {
+                    con.close();
+                    con = null;
+                }
+            }
+            return true;
+        } catch (SQLException ex) {
+            logger.error(ex.getMessage());
+        } catch (ClassNotFoundException ex) {
+            logger.error(ex.getMessage());
+        }
+        return false;
     }
 }

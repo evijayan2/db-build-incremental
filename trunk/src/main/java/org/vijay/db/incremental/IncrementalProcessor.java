@@ -6,22 +6,26 @@ package org.vijay.db.incremental;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Map;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+
 
 /**
  *
  * @author ElangovanV
  */
 public class IncrementalProcessor {
-
+private static Logger logger = Logger.getLogger(IncrementalProcessor.class.getName());
     private List incrementalList;
     private Database database;
+    private Map prop;
     private final int EXECUTE=0;
 
-    public IncrementalProcessor(List incrementalList, Database database) {
+    public IncrementalProcessor(List incrementalList, Database database, Map prop) {
         this.incrementalList = incrementalList;
         this.database = database;
+        this.prop=prop;
     }
 
     private int preProcess(Incremental incremental) throws SQLException {
@@ -50,18 +54,18 @@ public class IncrementalProcessor {
                         
                     executor = new SQLExcecutor();
                     if (preProcess(sqlIncremental) == EXECUTE) {
-                        exitVal = executor.execute(database, sqlIncremental);
+                        exitVal = executor.execute(database, sqlIncremental, prop);
                         
                         if (exitVal != 0) {
                             postProcess(sqlIncremental, "FAILED");
-                            Logger.getLogger(BuildIncremental.class.getName()).log(Level.SEVERE, "Incremental failed in {0} submitted by {1}", new Object[]{sqlIncremental.getFileName(), sqlIncremental.getSubmitter()});
+                            Logger.getLogger(BuildIncremental.class.getName()).log(Level.ERROR, "Incremental failed in "+ sqlIncremental.getFileName() +" submitted by "+sqlIncremental.getSubmitter());
                             return exitVal;
                         } else {
                             postProcess(sqlIncremental, "PASSED");
                         }
                     }
                 } catch (SQLException ex) {
-                    Logger.getLogger(IncrementalProcessor.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(IncrementalProcessor.class.getName()).log(Level.ERROR, null, ex);
                 }
             }
         }

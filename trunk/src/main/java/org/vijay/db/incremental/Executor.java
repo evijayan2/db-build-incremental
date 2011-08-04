@@ -4,7 +4,7 @@
  */
 package org.vijay.db.incremental;
 
-import java.util.Properties;
+import java.util.Map;
 
 /**
  *
@@ -12,6 +12,6 @@ import java.util.Properties;
  */
 public interface Executor {
     
-    public int execute(Database database, Incremental incremental);
+    public int execute(Database database, Incremental incremental, Map prop);
     
 }

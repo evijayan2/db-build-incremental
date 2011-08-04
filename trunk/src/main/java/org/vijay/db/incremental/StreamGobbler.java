@@ -6,30 +6,34 @@ package org.vijay.db.incremental;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import org.apache.log4j.Logger;
 
 /**
  *
  * @author ElangovanV
  */
 public class StreamGobbler extends Thread {
-
+private static Logger logger = Logger.getLogger(StreamGobbler.class.getName());
     InputStream is;
     String type;
     File os;
+    Process proc;
     
     StringBuffer sb;
 
-    public StreamGobbler(InputStream is, String type) {
-        this(is, type, null);
+    public StreamGobbler(InputStream is, String type, Process proc) {
+        this(is, type, null, proc);
     }
 
-    public StreamGobbler(InputStream is, String type, File redirect) {
+    public StreamGobbler(InputStream is, String type, File redirect, Process proc) {
         this.is = is;
         this.type = type;
         this.os = redirect;
+        this.proc=proc;
     }
 
     public void run() {
@@ -49,14 +53,21 @@ public class StreamGobbler extends Thread {
                     pw.println(line);
                     sb.append(line);
                 }
-                System.out.println(type + ">" + line);
+                logger.debug(type + ">" + line);
+                
+                if(line!=null && (line.contains("SP2-0310"))){
+                    
+                    proc.destroy();
+                    throw new IOException ("File Doesn't Exists = "+line);
+                }
             }
+            //System.out.println("called 1");
             if (pw != null) {
 
                 pw.flush();
             }
         } catch (Exception ioe) {
-            ioe.printStackTrace();
+            logger.error("Got Error!",ioe);
         } finally {
             if (pw != null) {
 
@@ -65,9 +76,11 @@ public class StreamGobbler extends Thread {
                 pw = null;
             }
         }
+        //System.out.println("called 2");
     }
     
     public String getMessage() {
+       //System.out.println("called 2 "+sb.toString()); 
         return sb.toString();
     }
 }

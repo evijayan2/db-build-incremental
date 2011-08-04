@@ -8,7 +8,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import javax.xml.namespace.QName;
@@ -27,13 +27,8 @@ import javax.xml.stream.events.XMLEvent;
  */
 public class XMLIncrementalProcessor {
 
-    public List processIncremental(String fileName, String sysDbname, Properties passwordProp) throws XMLStreamException, FileNotFoundException {
-
-        System.setProperty("javax.xml.stream.XMLInputFactory",
-                "com.bea.xml.stream.MXParserFactory");
-        System.setProperty("javax.xml.stream.XMLEventFactory",
-                "com.bea.xml.stream.EventFactory");
-
+    public List processIncremental(String fileName, String sysDbname, ConfigReader configReader) throws XMLStreamException, FileNotFoundException {
+        
         XMLInputFactory factory = XMLInputFactory.newInstance();
         XMLEventReader xmlr = factory.createXMLEventReader(new java.io.FileReader(fileName));
 
@@ -49,6 +44,10 @@ public class XMLIncrementalProcessor {
         String patchLevel = null;
         boolean isBuild = false;
         String sqlLogFile = null;
+        boolean isEnvironment= false;
+        
+        Map userProp=configReader.getUsers();
+        Map configMap = configReader.getConfig();
 
         while (xmlr.hasNext()) {
             XMLEvent e = xmlr.nextEvent();
@@ -57,7 +56,7 @@ public class XMLIncrementalProcessor {
 
                 case XMLStreamConstants.START_ELEMENT:
                     StartElement se = e.asStartElement();
-
+                    
                     qname = se.getName();
                     if (qname.getLocalPart().equalsIgnoreCase("build")) {
                         buildName = se.getAttributeByName(new QName("name")).getValue();
@@ -65,7 +64,7 @@ public class XMLIncrementalProcessor {
                         if (attribute!=null)
                             patchLevel = attribute.getValue();
                         isBuild = true;
-                    } else if (qname.getLocalPart().equalsIgnoreCase("sql") && (isBuild)) {
+                    } else if (qname.getLocalPart().equalsIgnoreCase("sql") && ((isBuild) || (isEnvironment))) {
                         map = new TreeMap();
                         sqlFileName = se.getAttributeByName(new QName("file")).getValue();
                         sqlSubmitter = se.getAttributeByName(new QName("submitter")).getValue();
@@ -74,19 +73,27 @@ public class XMLIncrementalProcessor {
                     } else if (qname.getLocalPart().equalsIgnoreCase("param") && (isSql)) {
                         sqlUser = se.getAttributeByName(new QName("name")).getValue();
                         sqlUserPosition = se.getAttributeByName(new QName("position")).getValue();                        
-                        map.put(sqlUserPosition, new UserPassParam(sqlUser, passwordProp.getProperty(sqlUser), Integer.parseInt(sqlUserPosition)));
+                        map.put(sqlUserPosition, new UserPassParam(sqlUser, userProp.get(sqlUser).toString(), Integer.parseInt(sqlUserPosition)));
+                    } else if (qname.getLocalPart().equalsIgnoreCase(configMap.get("environment").toString())) {
+                        buildName = se.getAttributeByName(new QName("name")).getValue();
+                        Attribute attribute=se.getAttributeByName(new QName("patch-level"));
+                        if (attribute!=null)
+                            patchLevel = attribute.getValue();                        
+                        isEnvironment=true;
                     }
                     break;
                 case XMLStreamConstants.END_ELEMENT:
                     EndElement ee = e.asEndElement();
 
                     qname = ee.getName();
-                    if (qname.getLocalPart().equalsIgnoreCase("sql") && (isBuild)) {                        
+                    if (qname.getLocalPart().equalsIgnoreCase("sql") && ((isBuild) || (isEnvironment))) {                       
                         sqlList.add(new SqlIncremental(sysDbname, buildName, patchLevel,new File(sqlFileName), sqlSubmitter, sqlLogFile,map));
                         isSql = false;
                         map=null;
                     } else if (qname.getLocalPart().equalsIgnoreCase("build") && (isSql == false)) {
                         isBuild = false;
+                    } else if (qname.getLocalPart().equalsIgnoreCase(configMap.get("environment").toString()) && (isSql == false)) {
+                        isEnvironment = false;
                     }
                     break;
             }

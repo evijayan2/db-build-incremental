@@ -5,7 +5,7 @@
 
     <groupId>org.vijay.db</groupId>
     <artifactId>db-incremental</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     
     <name>db-incremental</name>
     <build>

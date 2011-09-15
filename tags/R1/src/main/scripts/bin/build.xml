@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="windows-1252"?>
+
+<!--
+    Document   : build.xml
+    Created on : December 21, 2010, 11:50 AM
+    Author     : elangovanv
+    Description:
+        Purpose of the document follows.
+-->
+<project name="MyTask" basedir="." default="use">
+    
+    <path id="class.path">
+        <fileset dir="../lib">
+            <include name="**/*.jar" />
+        </fileset>
+		<pathelement location="../lib/stax-api-1.0.1.jar"/>
+		<pathelement location="../lib/stax-1.2.0_rc2-dev.jar"/>
+		<pathelement location="../lib/ojdbc-5.jar"/>
+		<pathelement location="../lib/ant-1.6.5.jar"/>
+		<pathelement location="../lib/db-incremental-1.0-SNAPSHOT.jar"/>
+    </path>
+
+    <target name="use" description="Use the Task">
+        
+        <taskdef name="deployincremental" classname="org.vijay.db.incremental.BuildIncremental" >
+			<classpath refid="class.path"/>
+        </taskdef>
+       <!-- <sysproperty key="javax.xml.stream.XMLInputFactory" value="com.bea.xml.stream.MXParserFactory"/>
+		<sysproperty key="javax.xml.stream.XMLEventFactory" value="com.bea.xml.stream.EventFactory"/> -->
+        <!-- <deployincremental IncrementalFile="d:/tmp/incremental.xml" ConfigFile="d:/tmp/incremental.xml" />  -->
+		
+		<deployincremental IncrementalFile="../conf/sample-incremental.xml" 
+						   ConfigFile="../conf/sample-ise-config.xml" 
+						   logfile="../conf/log.properties"/> 
+                
+    </target>
+</project>

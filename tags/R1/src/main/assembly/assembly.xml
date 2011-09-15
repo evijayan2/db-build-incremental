@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : assembly.xml
+    Created on : July 28, 2011, 1:27 AM
+    Author     : ElangovanV
+    Description:
+        Purpose of the document follows.
+-->
+
+<assembly>
+	<id>distribution</id>
+	<formats>
+		<format>zip</format>		
+	</formats>
+	<baseDirectory>db-incremental-${project.version}</baseDirectory>
+	<includeSiteDirectory>false</includeSiteDirectory>
+	<fileSets>
+		<fileSet>
+                     <directory>${project.build.directory}/lib</directory>
+                      <outputDirectory>lib</outputDirectory>
+			<includes>				
+                                <include>*.jar</include> 
+			</includes>
+		</fileSet>
+                <fileSet>
+                     <directory>${pom.basedir}/src/main/scripts</directory>
+                     <outputDirectory>/</outputDirectory>
+		</fileSet>
+                <fileSet>
+                     <directory>${project.build.directory}/</directory>
+                     <outputDirectory>lib</outputDirectory>
+                        <includes>				
+                                <include>db-incremental-${project.version}.jar</include> 
+			</includes>
+		</fileSet>
+	</fileSets>
+       <!-- <files>
+        	<file>
+		   <source>target/db-incremental-${project.version}.jar</source>
+                   <outputDirectory>/</outputDirectory>
+                </file>                
+        </files> -->
+</assembly>
+

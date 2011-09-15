@@ -1,0 +1,34 @@
+<incrementals>
+	<environment>
+		<ise name="isert1">
+			<sql file="../sample/sql/ise/a.sql" name="RT1" submitter="vijay" log-file="aise.log">
+				<param name="user1" position="1"/>						
+			</sql>	
+		</ise>
+		<stg name="stgrt1">
+			<sql file="../sample/sql/stg/a.sql" name="RT1" submitter="vijay" log-file="astg.log">
+				<param name="user1" position="2"/>					
+			</sql>	
+		</stg>		
+	</environment>
+	<build name="RT1">
+		<sql file="../sample/sql/rt1/a.sql" name="RT1" submitter="vijay" log-file="a.log">
+			<param name="user1" position="2"/>
+			<param name="user2" position="1"/>			
+			</sql>
+		 <sql file="../sample/sql/rt1/b.sql" name="RT1" submitter="vijay" log-file="b.log">
+			<param name="user4" position="1"/>
+			<param name="user2" position="2"/>
+		</sql>		
+	</build>
+	<build name="RT2" patch-level="a">
+		<sql file="../sample/sql/rt2/a.sql" name="RT1" submitter="vijay" log-file="a2.log">
+			<param name="user1" position="2"/>
+			<param name="user2" position="1"/>			
+		</sql>
+		<sql file="../sample/sql/rt2/b.sql" name="RT1" submitter="vijay" log-file="b2.log">
+			<param name="user4" position="1"/>
+			<param name="user2" position="2"/>			
+		</sql>		 
+	</build>
+</incrementals>

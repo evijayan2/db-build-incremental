@@ -10,14 +10,14 @@
 <project name="MyTask" basedir="." default="use">
     
     <path id="class.path">
-        <fileset dir="./lib">
+        <fileset dir="../lib">
             <include name="**/*.jar" />
         </fileset>
-		<pathelement location="./lib/stax-api-1.0.1.jar"/>
-		<pathelement location="./lib/stax-1.2.0_rc2-dev.jar"/>
-		<pathelement location="./lib/ojdbc-5.jar"/>
-		<pathelement location="./lib/ant-1.6.5.jar"/>
-		<pathelement location="./lib/db-incremental-1.0-SNAPSHOT.jar"/>
+		<pathelement location="../lib/stax-api-1.0.1.jar"/>
+		<pathelement location="../lib/stax-1.2.0_rc2-dev.jar"/>
+		<pathelement location="../lib/ojdbc-5.jar"/>
+		<pathelement location="../lib/ant-1.6.5.jar"/>
+		<pathelement location="../lib/db-incremental-1.0-SNAPSHOT.jar"/>
     </path>
 
     <target name="use" description="Use the Task">
@@ -29,7 +29,9 @@
 		<sysproperty key="javax.xml.stream.XMLEventFactory" value="com.bea.xml.stream.EventFactory"/> -->
         <!-- <deployincremental IncrementalFile="d:/tmp/incremental.xml" ConfigFile="d:/tmp/incremental.xml" />  -->
 		
-		<deployincremental IncrementalFile="d:/tmp/incremental.xml" ConfigFile="d:/tmp/ise-incremental-password.xml" logfile="D:/Development/Projects/db-build-incremental/trunk/lib/log.properties"/> 
+		<deployincremental IncrementalFile="../conf/sample-incremental.xml" 
+						   ConfigFile="../conf/sample-ise-config.xml" 
+						   logfile="../conf/log.properties"/> 
                 
     </target>
 </project>

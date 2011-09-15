@@ -19,18 +19,37 @@
                     <target>1.5</target>
                 </configuration>
             </plugin>
-      <plugin>
-         <artifactId>maven-jar-plugin</artifactId>
-         <configuration>
-           <archive>
-             <manifest>
-               <addClasspath>true</addClasspath>
-               <classpathPrefix>lib/</classpathPrefix>
-               <mainClass>org.vijay.db.incremental.BuildIncremental</mainClass>
-             </manifest>
-           </archive>
-         </configuration>
-      </plugin>
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>./</classpathPrefix>
+                            <mainClass>org.vijay.db.incremental.BuildIncremental</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>                            
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -43,34 +62,15 @@
                 </configuration>
                 <executions>
                     <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>			
                         <goals>
-                            <goal>assembly</goal>
+                            <goal>attached</goal>
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                              <overWriteReleases>false</overWriteReleases>
-                              <overWriteSnapshots>false</overWriteSnapshots>
-                              <overWriteIfNewer>true</overWriteIfNewer>                            
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-                
-        </plugins>
-        
+            </plugin>                
+        </plugins>        
     </build>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -120,7 +120,7 @@
                     <artifactId>stax-ri</artifactId>
                     <groupId>stax</groupId>
                 </exclusion>
-                </exclusions>
+            </exclusions>
             <!-- 
             <exclusion>
                     <artifactId>junitperf</artifactId>

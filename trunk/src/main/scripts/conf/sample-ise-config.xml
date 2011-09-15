@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : sample-ise-config.xml
+    Created on : July 27, 2011, 10:47 PM
+    Author     : ElangovanV
+    Description:
+        Purpose of the document follows.
+-->
+
+<config>
+<validateuser>true</validateuser>
+<logfolder>../logs/</logfolder>
+<environment>ise</environment>
+<users>
+	<entry name="user1" password="password1"/>
+	<entry name="user2" password="password2"/>
+	<entry name="user3" password="password3"/>
+	<entry name="user4" password="password4"/>
+	<entry name="user5" password="password5"/>
+	<entry name="user6" password="password6"/>
+</users>
+<database>
+	<db>oracle</db>
+	<command>sqlplus</command>
+	<dbname>xe</dbname>
+	<user>vijay</user>
+	<password>vijay</password>
+	<driver>oracle.jdbc.OracleDriver</driver>
+	<url>jdbc:oracle:thin:@localhost:1521:xe</url>
+</database>
+</config>

@@ -1,0 +1,1 @@
+Generates & Deploy the SQL to database incrementally
